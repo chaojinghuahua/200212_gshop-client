@@ -203,7 +203,16 @@
         }
 
         // 跳转到Search
-        this.$router.push(location)
+        // 如果当前没有在search，用push，否则用replace
+        // 在路由中有一个name  叫search
+        // if(this.$route.name !== 'search') {
+          // 通过路径来判断
+          // 这个路径还可能会包含关键字的搜索  /search/xxx,所以要用字符串写法
+        if(this.$route.path.indexOf('/search')!==0) {
+          this.$router.push(location)
+        } else {
+          this.$router.replace(location)
+        }
 
         // 自动隐藏列表
         this.hideSubCategorys()

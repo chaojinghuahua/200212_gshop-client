@@ -27,7 +27,6 @@ export default {
 
     // 分发给异步action请求获取分类数据  / 在路由切换时不会重新执行
     this.$store.dispatch('getCategoryList')
-
   },
 
   // 注册组件(局部, 当前组件可用)

@@ -71,9 +71,9 @@
               <li class="yui3-u-1-5" v-for=" item in productList.goodsList" :key="item.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javascript:">
+                    <router-link :to="`/detail/${item.id}`">
                       <img :src="item.defaultImg" />
-                      </a>
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -82,13 +82,13 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a href="javascript:">{{item.title}}</a>
+                    <router-link :to="`/search/${item.id}`">{{item.title}}</router-link>
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
                   </div>
                   <div class="operate">
-                    <a href="success-cart.html" target="_blank" class="sui-btn btn-bordered btn-danger">加入购物车</a>
+                    <a href="success-cart.html"  class="sui-btn btn-bordered btn-danger" @click="addToCart(item)" >加入购物车</a>
                     <a href="javascript:void(0);" class="sui-btn btn-bordered">收藏</a>
                   </div>
                 </div>
@@ -168,6 +168,34 @@
     },
 
     methods: {
+
+       /* 
+      添加到购物车
+      */
+      async addToCart (item) {
+        try {
+          // 分发异步action
+          await this.$store.dispatch('addToCart2', {skuId:item.id, skuNum: 1})
+          // 成功后
+          // 根据当前商品的信息数据整理一个skuInfo对象
+          const skuInfo = {
+            // skuDefaultImg,skuName,id这些都是购物车组件所需要的一些信息
+            skuDefaultImg: item.defaultImg,
+            skuName: item.title,
+            id: item.id,
+          }
+          // 保存商品信息对象到sessionStorage
+          window.sessionStorage.setItem('SKU_INFO_KEY', JSON.stringify(skuInfo))
+          // 跳转到添加购物车成功的界面
+          this.$router.push({
+            path: '/addcartsuccess',
+            query: {skuNum: 1}
+          })
+        } catch (error) {
+          alert(error.message)
+        }
+      },
+
 
       /* 
       设置新的排序

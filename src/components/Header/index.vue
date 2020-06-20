@@ -5,7 +5,11 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <p v-if="userInfo.token">
+          <span>{{userInfo.name}}</span> &nbsp; &nbsp;
+          <a href="javascript:" @click="logout">退出</a>
+          </p>
+          <p v-else>
             <span>请</span>
             <!-- <router-link to="/login">登录</router-link> -->
             <router-link :to="{path: '/login'}">登录</router-link>
@@ -13,8 +17,8 @@
           </p>
         </div>
         <div class="typeList">
-          <a href="###">我的订单</a>
-          <a href="###">我的购物车</a>
+          <router-link to="/center/myorder">我的订单</router-link>
+          <router-link to="/shopcart">我的购物车</router-link>
           <a href="###">我的尚品汇</a>
           <a href="###">尚品汇会员</a>
           <a href="###">企业采购</a>
@@ -33,14 +37,16 @@
       </h1>
 
       <div class="searchArea">
-        <form action="###" class="searchForm">
+        <form action="###" class="searchForm"  @submit.prevent="search" >
           <input type="text" id="autocomplete" class="input-error input-xxlarge"  v-model="keyword"/>
-          <button class="sui-btn btn-xlarge btn-danger" type="button" @click="search">搜索</button>
+          <!-- <button class="sui-btn btn-xlarge btn-danger"  @click.prevent="search">搜索</button> -->
+          <button class="sui-btn btn-xlarge btn-danger" >搜索</button>
         </form>
       </div>
     </div>
   </header>
 </template>
+
 
 <script>
   export default {
@@ -52,7 +58,34 @@
       }
     },
 
+    computed: {
+      userInfo(){
+        return this.$store.state.user.userInfo
+      }
+    },
+
+    mounted() {
+      // 在Header中，通过事件总线绑定自定义事件监听，在回调中删除数据
+      this.$bus.$on('removeKeyword',()=>{
+        this.keyword = ''
+      })
+    },
+
     methods: {
+      /*
+      退出登录
+      */
+      logout () {
+        if (confirm('确定退出吗?')) {
+          // 分发异步action给user.js中的logout
+          this.$store.dispatch('logout').then(() => {
+            this.$router.push('/login')
+          }).catch(error => {
+            alert(error.message)
+          })
+        }
+      },
+
       search () {
         const {keyword} = this
         // 编程式路由跳转/导航
@@ -84,7 +117,19 @@
           // console.log('出错了')
         }) */
 
-        this.$router.push(location)
+        // 如果当前没有在search，用push，否则用replace
+        // 在路由中有一个name  叫search
+        // if(this.$route.name !== 'search') {
+          // 通过路径来判断
+          // 这个路径还可能会包含关键字的搜索  /search/xxx,所以要用字符串写法
+        if(this.$route.path.indexOf('/search')!==0) {
+          this.$router.push(location)
+        } else {
+          this.$router.replace(location)
+        }
+
+
+        
         // this.$router.push(location, ()=> {})
         // this.$router.replace(location, ()=> {})
       }

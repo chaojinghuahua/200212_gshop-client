@@ -17,6 +17,18 @@ const actions = {
   请求获取商品列表数据的异步action
   */
   async getProductList ({commit}, options) {
+    // 为了不删除search组建中的options内部的属性值
+    options={...options}  //对options实现了一个浅拷贝   
+    
+    // 删除optiongs中属性值为空串,或者空数组的属性
+    Object.keys(options).forEach(key =>{
+      if(options[key] === '' || Array.isArray(options[key]) && options[key].length===0){
+        delete options[key]
+      }
+    })
+    
+    
+    
     const result = await reqProductList(options)
     if (result.code===200) {
       const productList = result.data
